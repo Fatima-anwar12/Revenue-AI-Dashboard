@@ -2,7 +2,7 @@
 
 import { ReactNode } from "react";
 import { use } from "react";
-import { mockStores } from "@/lib/mock/stores";
+import { getStoreBySlug } from "@/lib/stores";
 import { CartProvider } from "@/components/store/CartContext";
 import StoreNavbar from "@/components/store/StoreNavbar";
 import StoreFooter from "@/components/store/StoreFooter";
@@ -15,7 +15,7 @@ interface StoreLayoutProps {
 
 export default function StoreLayout({ children, params }: StoreLayoutProps) {
   const { slug } = use(params);
-  const store = mockStores.find((s) => s.slug === slug);
+  const store = getStoreBySlug(slug);
   if (!store) {
     return (
       <div className="flex min-h-screen items-center justify-center text-slate-500">

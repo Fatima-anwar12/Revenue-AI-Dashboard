@@ -11,11 +11,11 @@ export default function StoreHero({ store }: StoreHeroProps) {
   return (
     <section className="relative overflow-hidden bg-slate-50">
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
-        <div className="max-w-2xl">
-          <h1 className="text-4xl font-semibold tracking-[-0.04em] text-slate-900 sm:text-5xl">
-            {store.heroTitle}
-          </h1>
-          <p className="mt-4 text-lg text-slate-600">{store.heroDescription}</p>
+      <div className="max-w-2xl">
+        <h1 className="text-4xl font-semibold tracking-[-0.04em] text-slate-900 sm:text-5xl">
+          {store.heroTitle || store.name}
+        </h1>
+        <p className="mt-4 text-lg text-slate-600">{store.heroDescription || store.description}</p>
           <div className="mt-8">
             <Link
               href={`/store/${store.slug}#products`}

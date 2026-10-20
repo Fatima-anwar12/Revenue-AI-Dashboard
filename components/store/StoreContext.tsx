@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, ReactNode, useEffect } from "react";
 import { Store } from "@/lib/mock/stores";
-import { getStoreBySlug } from "@/lib/supabase/stores";
+import { getStoreBySlug } from "@/lib/stores";
 
 interface StoreContextValue {
   store: Store | null;
@@ -30,7 +30,7 @@ export function StoreProvider({ children, slug }: StoreProviderProps) {
       setError("");
 
       try {
-        const data = await getStoreBySlug(slug);
+        const data = getStoreBySlug(slug);
         if (!cancelled) {
           setStore(data);
           if (!data) {

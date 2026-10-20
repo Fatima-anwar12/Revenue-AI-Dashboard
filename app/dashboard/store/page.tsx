@@ -6,9 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SectionHeader } from "@/components/dashboard/SectionHeader";
 import { Store } from "@/lib/mock/stores";
-import { getStores, createStore } from "@/lib/supabase/stores";
-import { getCurrentUser } from "@/lib/supabase/auth";
+import { getStores, createStore, generateSlug } from "@/lib/stores";
 import { Loader2 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export default function StorePage() {
   const router = useRouter();
@@ -30,16 +30,8 @@ export default function StorePage() {
     const loadStores = async () => {
       setLoading(true);
       setError("");
-
-      const userResult = await getCurrentUser();
-      if (!userResult.success || !userResult.user) {
-        setError("Please sign in to view stores.");
-        setLoading(false);
-        return;
-      }
-
       try {
-        const data = await getStores(userResult.user.id);
+        const data = getStores();
         setStores(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to load stores.");
@@ -50,6 +42,12 @@ export default function StorePage() {
 
     loadStores();
   }, []);
+
+  useEffect(() => {
+    if (form.name && !form.slug) {
+      setForm((f) => ({ ...f, slug: generateSlug(f.name) }));
+    }
+  }, [form.name, form.slug]);
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
@@ -65,17 +63,13 @@ export default function StorePage() {
     e.preventDefault();
     if (!validate()) return;
 
-    const userResult = await getCurrentUser();
-    if (!userResult.success || !userResult.user) {
-      setError("Please sign in to create a store.");
-      return;
-    }
-
     setSaving(true);
     try {
-      const newStore = await createStore(userResult.user.id, {
+      const slug = generateSlug(form.slug);
+      const newStore = createStore({
+        userId: "local-user",
         name: form.name,
-        slug: form.slug,
+        slug,
         description: form.description,
         logo: form.logo,
         heroTitle: form.heroTitle,
@@ -133,7 +127,7 @@ export default function StorePage() {
               <label className="block text-sm font-medium text-slate-700">Store Slug</label>
               <Input
                 value={form.slug}
-                onChange={(e) => setForm((f) => ({ ...f, slug: e.target.value }))}
+                onChange={(e) => setForm((f) => ({ ...f, slug: generateSlug(e.target.value) }))}
                 placeholder="e.g. fatima-fashion"
                 className={cn("mt-1.5", errors.slug && "border-red-500 focus-visible:border-red-500 focus-visible:ring-red-100")}
               />
@@ -243,8 +237,4 @@ export default function StorePage() {
       </div>
     </div>
   );
-}
-
-function cn(...classes: (string | undefined | false)[]) {
-  return classes.filter(Boolean).join(" ");
 }
